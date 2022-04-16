@@ -1,6 +1,0 @@
-python demo.py \
---arch resnet18 \
---gpus 0 \
---load_model /model_chk/model_100.pth \
---image /sample_data/0000100_02616_d_0000012.jpg \
---exp_id test_1
