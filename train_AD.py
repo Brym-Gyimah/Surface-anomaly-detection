@@ -43,11 +43,10 @@ def train_on_device(obj_names, args):
         model_seg.cuda()
         model_seg.apply(weights_init)
         
-        data = data.cuda()
         
         #Have a second look at this place
         # data ought to the ooutput of the reconstructive model
-        ret = model_seg(data)
+        #ret = model_seg(data)
 
         optimizer = torch.optim.Adam([
                                       {"params": model.parameters(), "lr": args.lr},
@@ -57,7 +56,7 @@ def train_on_device(obj_names, args):
 
         loss_l2 = torch.nn.modules.loss.MSELoss()
         loss_ssim = SSIM()
-        loss_focal = ret["loss"]
+        #loss_focal = ret["loss"]
 
         #dataset = MVTecDRAEMTrainDataset(args.data_path + obj_name + "/train/good/", args.anomaly_source_path, resize_shape=[256, 256])
         train_dataset = dataset.MVTecTrainDataset(root=args.data, category=args.category, args.anomaly_source_path, input_size=config["input_size"], resize_shape=[256, 256])
@@ -80,7 +79,8 @@ def train_on_device(obj_names, args):
 
                 l2_loss = loss_l2(gray_rec,gray_batch)
                 ssim_loss = loss_ssim(gray_rec, gray_batch)
-
+                
+                loss_focal = out_mask["loss"]
                 segment_loss = loss_focal(out_mask_sm, anomaly_mask)
                 loss = l2_loss + ssim_loss + segment_loss
 
