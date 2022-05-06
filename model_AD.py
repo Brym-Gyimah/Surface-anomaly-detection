@@ -5,8 +5,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-import constants as const
-
 #Defining the Reconstructive SubNetwork architecture
 class ReconstructiveSubNetwork(nn.Module):
     def __init__(self,in_channels=3, out_channels=3, base_width=128):
