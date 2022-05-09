@@ -13,11 +13,20 @@ from perlin import rand_perlin_2d_np
 
 
 class MVTecTrainDataset(torch.utils.data.Dataset):
-    def __init__(self, root, category, anomaly_source_path, resize_shape=None):
+
+    def __init__(self, root_dir, anomaly_source_path, resize_shape=None):
+        """
+        Args:
+            root_dir (string): Directory with all the images.
+            transform (callable, optional): Optional transform to be applied
+                on a sample.
+        """
+        self.root_dir = root_dir
         self.resize_shape=resize_shape
 
-        self.image_files = glob(os.path.join(root, category, "train", "good", "*.png"))
-        self.anomaly_source_paths = sorted(glob(anomaly_source_path+"/*/*.jpg"))
+        self.image_paths = sorted(glob.glob(root_dir+"/*.png"))
+
+        self.anomaly_source_paths = sorted(glob.glob(anomaly_source_path+"/*/*.jpg"))
 
         self.augmenters = [iaa.GammaContrast((0.5,2.0),per_channel=True),
                       iaa.MultiplyAndAddToBrightness(mul=(0.8,1.2),add=(-30,30)),
@@ -33,11 +42,9 @@ class MVTecTrainDataset(torch.utils.data.Dataset):
 
         self.rot = iaa.Sequential([iaa.Affine(rotate=(-90, 90))])
 
- 
+
     def __len__(self):
-        return len(self.image_files)
-
-
+        return len(self.image_paths)
 
 
     def randAugmenter(self):
@@ -47,7 +54,6 @@ class MVTecTrainDataset(torch.utils.data.Dataset):
                               self.augmenters[aug_ind[2]]]
                              )
         return aug
-
 
     def augment_image(self, image, anomaly_source_path):
         aug = self.randAugmenter()
@@ -86,8 +92,6 @@ class MVTecTrainDataset(torch.utils.data.Dataset):
                 has_anomaly=0.0
             return augmented_image, msk, np.array([has_anomaly],dtype=np.float32)
 
-
-
     def transform_image(self, image_path, anomaly_source_path):
         image = cv2.imread(image_path)
         image = cv2.resize(image, dsize=(self.resize_shape[1], self.resize_shape[0]))
@@ -103,19 +107,19 @@ class MVTecTrainDataset(torch.utils.data.Dataset):
         anomaly_mask = np.transpose(anomaly_mask, (2, 0, 1))
         return image, augmented_image, anomaly_mask, has_anomaly
 
-
-
-    def __getitem__(self, index):
-        image_file = self.image_files[index]
-        image = Image.open(image_file)
+    def __getitem__(self, idx):
+        idx = torch.randint(0, len(self.image_paths), (1,)).item()
         anomaly_source_idx = torch.randint(0, len(self.anomaly_source_paths), (1,)).item()
-        image, augmented_image, anomaly_mask, has_anomaly = self.transform_image(image, self.anomaly_source_paths[anomaly_source_idx])
+        image, augmented_image, anomaly_mask, has_anomaly = self.transform_image(self.image_paths[idx],
+                                                                           self.anomaly_source_paths[anomaly_source_idx])
         sample = {'image': image, "anomaly_mask": anomaly_mask,
                   'augmented_image': augmented_image, 'has_anomaly': has_anomaly, 'idx': idx}
+
         return sample
 
-
-
+    
+    
+    
 class MVTecTestDataset(torch.utils.data.Dataset):
 
     def __init__(self, root, category, input_size, resize_shape=None):
