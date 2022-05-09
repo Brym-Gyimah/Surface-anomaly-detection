@@ -2,7 +2,7 @@ import os
 import numpy as np
 import cv2
 
-from glob import glob
+import glob
 
 import torch
 import torch.utils.data
@@ -17,7 +17,7 @@ class MVTecTrainDataset(torch.utils.data.Dataset):
         self.resize_shape=resize_shape
 
         self.image_files = glob(os.path.join(root, category, "train", "good", "*.png"))
-        self.anomaly_source_paths = sorted(glob.glob(anomaly_source_path+"/*/*.jpg"))
+        self.anomaly_source_paths = sorted(glob(anomaly_source_path+"/*/*.jpg"))
 
         self.augmenters = [iaa.GammaContrast((0.5,2.0),per_channel=True),
                       iaa.MultiplyAndAddToBrightness(mul=(0.8,1.2),add=(-30,30)),
