@@ -13,7 +13,7 @@ from perlin import rand_perlin_2d_np
 
 
 class MVTecTrainDataset(torch.utils.data.Dataset):
-    def __init__(self, root, category, input_size, anomaly_source_path, resize_shape=None):
+    def __init__(self, root, category, anomaly_source_path, resize_shape=None):
         self.resize_shape=resize_shape
 
         self.image_files = glob(os.path.join(root, category, "train", "good", "*.png"))
