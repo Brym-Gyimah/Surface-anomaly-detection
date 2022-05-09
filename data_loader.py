@@ -123,10 +123,11 @@ class MVTecTrainDataset(torch.utils.data.Dataset):
 class MVTecTestDataset(torch.utils.data.Dataset):
 
     def __init__(self, root, category, input_size, resize_shape=None):
-
-        self.images = glob(os.path.join(root, category, "test", "*", "*.png"))
+        self.root_dir = root_dir
+        self.images = sorted(glob.glob(root_dir+"/*/*.png"))
         self.resize_shape=resize_shape
-
+        
+        
     def __len__(self):
         return len(self.images)
 
