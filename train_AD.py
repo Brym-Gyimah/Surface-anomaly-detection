@@ -1,6 +1,8 @@
 import torch
 from data_loader import MVTecTrainDataset
 from torch.utils.data import DataLoader
+import constants as const
+
 from torch import optim
 from tensorboard_visualizer import TensorboardVisualizer
 from model_AD import ReconstructiveSubNetwork, FastFlow
