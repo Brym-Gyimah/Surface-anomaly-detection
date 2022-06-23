@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-from data_loader import MVTecDRAEMTestDataset
+from data_loader import MVTecTestDataset
 from torch.utils.data import DataLoader
 import numpy as np
 from sklearn.metrics import roc_auc_score, average_precision_score
