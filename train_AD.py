@@ -31,11 +31,7 @@ def build_model(config):
         conv3x3_only=config["conv3x3_only"],
         hidden_ratio=config["hidden_ratio"],
     )
-    print(
-        "Model A.D. Param#: {}".format(
-            sum(p.numel() for p in model.parameters() if p.requires_grad)
-        )
-    )
+
     return model
 
 
