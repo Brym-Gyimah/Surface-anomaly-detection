@@ -39,7 +39,7 @@ def train_on_device(obj_names, args):
         model.apply(weights_init)
 
         # have a second look at the input_size to the fastflow network
-        model_seg = model_AD.FastFlow(backbone_name=config["backbone_name"], flow_steps=config["flow_step"],
+        model_seg = FastFlow(backbone_name=config["backbone_name"], flow_steps=config["flow_step"],
                                       input_size=config["input_size"], conv3x3_only=config["conv3x3_only"],
                                       hidden_ratio=config["hidden_ratio"],)
         model_seg.cuda()
