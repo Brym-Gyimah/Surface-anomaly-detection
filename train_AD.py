@@ -1,6 +1,7 @@
 import torch
 from data_loader import MVTecTrainDataset
 from torch.utils.data import DataLoader
+import yaml
 import constants as const
 
 from torch import optim
@@ -21,6 +22,24 @@ def weights_init(m):
         m.weight.data.normal_(1.0, 0.02)
         m.bias.data.fill_(0)
 
+
+def build_model(config):
+    model = FastFlow(
+        backbone_name=config["backbone_name"],
+        flow_steps=config["flow_step"],
+        input_size=config["input_size"],
+        conv3x3_only=config["conv3x3_only"],
+        hidden_ratio=config["hidden_ratio"],
+    )
+    print(
+        "Model A.D. Param#: {}".format(
+            sum(p.numel() for p in model.parameters() if p.requires_grad)
+        )
+    )
+    return model
+
+
+
 def train_on_device(obj_names, args):
 
     if not os.path.exists(args.checkpoint_path):
@@ -39,12 +58,13 @@ def train_on_device(obj_names, args):
         model.apply(weights_init)
 
         # have a second look at the input_size to the fastflow network
-        model_seg = FastFlow(backbone_name=config["backbone_name"], flow_steps=config["flow_step"],
-                                      input_size=config["input_size"], conv3x3_only=config["conv3x3_only"],
-                                      hidden_ratio=config["hidden_ratio"],)
-        model_seg.cuda()
-        model_seg.apply(weights_init)
         
+        
+        config = yaml.safe_load(open(args.config, "r"))
+        model_seg = build_model(config)
+        model_seg.cuda()
+
+       
         
         #Have a second look at this place
         # data ought to the ooutput of the reconstructive model
@@ -52,7 +72,7 @@ def train_on_device(obj_names, args):
 
         optimizer = torch.optim.Adam([
                                       {"params": model.parameters(), "lr": args.lr},
-                                      {"params": model_seg.parameters(), "lr": args.lr, weight_decay=const.WEIGHT_DECAY}])
+                                      {"params": model_seg.parameters(), "lr": args.lr}])
 
         scheduler = optim.lr_scheduler.MultiStepLR(optimizer,[args.epochs*0.8,args.epochs*0.9],gamma=0.2, last_epoch=-1)
 
@@ -60,11 +80,11 @@ def train_on_device(obj_names, args):
         loss_ssim = SSIM()
         #loss_focal = ret["loss"]
 
-        
-        train_dataset = MVTecDRAEMTrainDataset(args.data_path + obj_name + "/train/good/", args.anomaly_source_path, resize_shape=[256, 256])
-        #train_dataset = dataset.MVTecTrainDataset(root=args.data, category=args.category, args.anomaly_source_path, input_size=config["input_size"], resize_shape=[256, 256])
+
+        train_dataset = MVTecTrainDataset(args.data_path + obj_name + "/train/good/", args.anomaly_source_path, resize_shape=[256, 256])
+
         dataloader = DataLoader(train_dataset, batch_size=args.bs,
-                                shuffle=True, num_workers=16)
+                                shuffle=False, num_workers=2)
 
         n_iter = 0
         for epoch in range(args.epochs):
@@ -119,6 +139,7 @@ if __name__=="__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--obj_id', action='store', type=int, required=True)
     parser.add_argument('--bs', action='store', type=int, required=True)
+    parser.add_argument("-cfg", "--config", type=str, required=True, help="path to config file")
     parser.add_argument('--lr', action='store', type=float, required=True)
     parser.add_argument('--epochs', action='store', type=int, required=True)
     parser.add_argument('--gpu_id', action='store', type=int, default=0, required=False)
