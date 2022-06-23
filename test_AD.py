@@ -2,9 +2,12 @@ import torch
 import torch.nn.functional as F
 from data_loader import MVTecTestDataset
 from torch.utils.data import DataLoader
+
 import numpy as np
+import yaml
+
 from sklearn.metrics import roc_auc_score, average_precision_score
-from model_unet import ReconstructiveSubNetwork, DiscriminativeSubNetwork
+from model_AD import ReconstructiveSubNetwork, FastFlow
 import os
 
 def write_results_to_file(run_name, image_auc, pixel_auc, image_ap, pixel_ap):
@@ -37,6 +40,19 @@ def write_results_to_file(run_name, image_auc, pixel_auc, image_ap, pixel_ap):
         file.write(fin_str)
 
 
+def build_model(config):
+    model = FastFlow(
+        backbone_name=config["backbone_name"],
+        flow_steps=config["flow_step"],
+        input_size=config["input_size"],
+        conv3x3_only=config["conv3x3_only"],
+        hidden_ratio=config["hidden_ratio"],
+    )
+
+    return model
+
+
+
 def test(obj_names, mvtec_path, checkpoint_path, base_model_name):
     obj_ap_pixel_list = []
     obj_auroc_pixel_list = []
@@ -50,13 +66,17 @@ def test(obj_names, mvtec_path, checkpoint_path, base_model_name):
         model.load_state_dict(torch.load(os.path.join(checkpoint_path,run_name+".pckl"), map_location='cuda:0'))
         model.cuda()
         model.eval()
-
-        model_seg = DiscriminativeSubNetwork(in_channels=6, out_channels=2)
+        
+           
+        
+        config = yaml.safe_load(open(args.config, "r"))
+        model_seg = build_model(config)
         model_seg.load_state_dict(torch.load(os.path.join(checkpoint_path, run_name+"_seg.pckl"), map_location='cuda:0'))
         model_seg.cuda()
         model_seg.eval()
 
-        dataset = MVTecDRAEMTestDataset(mvtec_path + obj_name + "/test/", resize_shape=[img_dim, img_dim])
+
+        dataset = MVTecTestDataset(mvtec_path + obj_name + "/test/", resize_shape=[img_dim, img_dim])
         dataloader = DataLoader(dataset, batch_size=1,
                                 shuffle=False, num_workers=0)
 
