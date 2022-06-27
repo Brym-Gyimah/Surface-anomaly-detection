@@ -4,6 +4,8 @@ import timm
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import constants as const
+
 
 #Defining the Reconstructive SubNetwork architecture
 class ReconstructiveSubNetwork(nn.Module):
