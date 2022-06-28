@@ -236,15 +236,17 @@ class FastFlow(nn.Module):
     ):
         super(FastFlow, self).__init__()
         
-
-
-        if backbone_name in ["cait_m48_448", "deit_base_distilled_patch16_384"]:
+        assert (
+            backbone_name in const.SUPPORTED_BACKBONES
+        ), "backbone_name must be one of {}".format(const.SUPPORTED_BACKBONES)
+       
+        if backbone_name in [const.BACKBONE_CAIT, const.BACKBONE_DEIT]:
             self.feature_extractor = timm.create_model(backbone_name, pretrained=True)
             channels = [768]
             scales = [16]
             
             
-        elseif backbone_name in ["resnet18", "wide_resnet50_2"]:
+        else:
             self.feature_extractor = timm.create_model(
                 backbone_name,
                 pretrained=True,
@@ -266,11 +268,6 @@ class FastFlow(nn.Module):
                         elementwise_affine=True,
                     )
                 )
-        else:
-            raise ValueError(
-                f"Backbone {backbone} is not supported. List of available backbones are "
-                "[cait_m48_448, deit_base_distilled_patch16_384, resnet18, wide_resnet50_2]."
-             )
 
         for param in self.feature_extractor.parameters():
             param.requires_grad = False
@@ -286,10 +283,8 @@ class FastFlow(nn.Module):
                 )
             )
           
-        
-        #Have a second look at line 234 as it is the output of the reconstructive subnetwork
         self.input_size = input_size
-        self.anomaly_map_generator = AnomalyMapGenerator(input_size=input_size)
+        #self.anomaly_map_generator = AnomalyMapGenerator(input_size=input_size)
 
     def forward(self, input_tensor):
           
