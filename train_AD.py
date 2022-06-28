@@ -6,7 +6,9 @@ import constants as const
 
 from torch import optim
 from tensorboard_visualizer import TensorboardVisualizer
-from model_AD import ReconstructiveSubNetwork, FastFlow
+#from model_AD import ReconstructiveSubNetwork, FastFlow
+from Anomaly_model import ReconstructiveSubNetwork, FastFlow
+
 from loss import SSIM, FastflowLoss
 import os
 
