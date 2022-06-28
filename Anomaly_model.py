@@ -179,22 +179,6 @@ def subnet_conv_func(kernel_size, hidden_ratio):
 def nf_fast_flow(input_dimensions, conv3x3_only, hidden_ratio, flow_steps, clamp=2.0):
 
 
-"""Create NF Fast Flow Block.
-   
-This is to create Normalizing Flow (NF) Fast Flow model block based on
-Figure 2 and Section 3.3 in the reference Fastflow architecture in the paper.
-
-Args:
-     input_dimensions (List[int]): Input dimensions (Channel, Height, Width)
-     conv3x3_only (bool): Boolean whether to use conv3x3 only or conv3x3 and conv1x1.
-     hidden_ratio (float): Ratio for the hidden layer channels.
-     flow_steps (int): Flow steps.
-     clamp (float, optional): Clamp. Defaults to 2.0.
- Returns:
-     SequenceINN: FastFlow Block.
- """
- 
- 
     nodes = Ff.SequenceINN(*input_dimensions)
     for i in range(flow_steps):
         if i % 2 == 1 and not conv3x3_only:
@@ -212,19 +196,6 @@ Args:
 
 
 class FastFlow(nn.Module):
-
-"""FastFlow.
-    Unsupervised Anomaly Detection and Localization via 2D Normalizing Flows.
-    Args:
-        input_size (int): Model input size,
-        backbone (str): Backbone CNN network
-        flow_steps (int): Flow steps.
-        conv3x3_only (bool, optinoal): Use only conv3x3 in fast_flow model. Defaults to False.
-        hidden_ratio (float, optional): Ratio to calculate hidden var channels. Defaults to 1.0.
-    Raises:
-        ValueError: When the backbone is not supported.
-    """
-
 
     def __init__(
         self,
@@ -261,7 +232,7 @@ class FastFlow(nn.Module):
             # for resnets, self.norms are trainable LayerNorm
             
             self.norms = nn.ModuleList()
-            for channel, scale in zip(channels, scales):
+            for in_channels, scale in zip(channels, scales):
                 self.norms.append(
                     nn.LayerNorm(
                         [in_channels, int(input_size / scale), int(input_size / scale)],
@@ -273,7 +244,7 @@ class FastFlow(nn.Module):
             param.requires_grad = False
 
         self.nf_flows = nn.ModuleList()
-        for channel, scale in zip(channels, scales):
+        for in_channels, scale in zip(channels, scales):
             self.nf_flows.append(
                 nf_fast_flow(
                     [in_channels, int(input_size / scale), int(input_size / scale)],
@@ -316,25 +287,15 @@ class FastFlow(nn.Module):
         return return_val
         
     
-    def _get_cnn_features(self, input_tensor: Tensor) -> List[Tensor]:
-        """Get CNN-based features.
-        Args:
-            input_tensor (Tensor): Input Tensor.
-        Returns:
-            List[Tensor]: List of features.
-        """
+    def _get_cnn_features(self, input_tensor):
+
         features = self.feature_extractor(input_tensor)
         features = [self.norms[i](feature) for i, feature in enumerate(features)]
         return features
         
 
-    def _get_cait_features(self, input_tensor: Tensor) -> List[Tensor]:
-        """Get Class-Attention-Image-Transformers (CaiT) features.
-        Args:
-            input_tensor (Tensor): Input Tensor.
-        Returns:
-            List[Tensor]: List of features.
-        """
+    def _get_cait_features(self, input_tensor):
+
         feature = self.feature_extractor.patch_embed(input_tensor)
         feature = feature + self.feature_extractor.pos_embed
         feature = self.feature_extractor.pos_drop(feature)
@@ -348,13 +309,8 @@ class FastFlow(nn.Module):
         return features
 
 
-    def _get_vit_features(self, input_tensor: Tensor) -> List[Tensor]:
-        """Get Vision Transformers (ViT) features.
-        Args:
-            input_tensor (Tensor): Input Tensor.
-        Returns:
-            List[Tensor]: List of features.
-        """
+    def _get_vit_features(self, input_tensor):
+
         feature = self.feature_extractor.patch_embed(input_tensor)
         cls_token = self.feature_extractor.cls_token.expand(feature.shape[0], -1, -1)
         if self.feature_extractor.dist_token is None:
