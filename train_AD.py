@@ -7,7 +7,7 @@ import constants as const
 from torch import optim
 from tensorboard_visualizer import TensorboardVisualizer
 from model_AD import ReconstructiveSubNetwork, FastFlow
-from loss import SSIM
+from loss import SSIM, FastflowLoss
 import os
 
 def get_lr(optimizer):
