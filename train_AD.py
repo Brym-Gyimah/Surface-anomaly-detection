@@ -15,6 +15,7 @@ import os
 def get_lr(optimizer):
     for param_group in optimizer.param_groups:
         return param_group['lr']
+        
 
 def weights_init(m):
     classname = m.__class__.__name__
@@ -37,7 +38,6 @@ def build_model(config):
     return model
 
 
-
 def train_on_device(obj_names, args):
 
     if not os.path.exists(args.checkpoint_path):
@@ -51,22 +51,19 @@ def train_on_device(obj_names, args):
 
         visualizer = TensorboardVisualizer(log_dir=os.path.join(args.log_path, run_name+"/"))
 
+        
         model = ReconstructiveSubNetwork(in_channels=3, out_channels=3)
         model.cuda()
         model.apply(weights_init)
 
-        # have a second look at the input_size to the fastflow network
-        
-        
+                      
         config = yaml.safe_load(open(args.config, "r"))
         model_seg = build_model(config)
         model_seg.cuda()
+        model_seg.apply(weights_init)
 
        
-        
-        #Have a second look at this place
-        # data ought to the ooutput of the reconstructive model
-        #ret = model_seg(data)
+
 
         optimizer = torch.optim.Adam([
                                       {"params": model.parameters(), "lr": args.lr},
@@ -76,14 +73,12 @@ def train_on_device(obj_names, args):
 
         loss_l2 = torch.nn.modules.loss.MSELoss()
         loss_ssim = SSIM()
-        #loss_focal = ret["loss"]
         loss_fastflow = FastflowLoss()
 
 
         train_dataset = MVTecTrainDataset(args.data_path + obj_name + "/train/good/", args.anomaly_source_path, resize_shape=[256, 256])
 
-        dataloader = DataLoader(train_dataset, batch_size=args.bs,
-                                shuffle=False, num_workers=2)
+        dataloader = DataLoader(train_dataset, batch_size=args.bs, shuffle=False, num_workers=2)
 
         n_iter = 0
         for epoch in range(args.epochs):
@@ -102,7 +97,6 @@ def train_on_device(obj_names, args):
                 l2_loss = loss_l2(gray_rec,gray_batch)
                 ssim_loss = loss_ssim(gray_rec, gray_batch)
                 
-                #loss_focal = out_mask["loss"]
                 segment_loss = loss_fastflow(out_mask_sm, anomaly_mask)
                 loss = l2_loss + ssim_loss + segment_loss
 
