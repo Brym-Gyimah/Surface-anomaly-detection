@@ -195,6 +195,9 @@ class FastFlow(nn.Module):
         hidden_ratio=1.0,
     ):
         super(FastFlow, self).__init__()
+        
+        self.input_size = input_size
+
         assert (
             backbone_name in const.SUPPORTED_BACKBONES
         ), "backbone_name must be one of {}".format(const.SUPPORTED_BACKBONES)
@@ -237,7 +240,6 @@ class FastFlow(nn.Module):
                     flow_steps=flow_steps,
                 )
             )
-        self.input_size = input_size
 
     def forward(self, x):
         self.feature_extractor.eval()
