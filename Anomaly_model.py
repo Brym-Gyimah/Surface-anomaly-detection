@@ -178,19 +178,23 @@ def subnet_conv_func(kernel_size, hidden_ratio):
 
 def nf_fast_flow(input_dimensions, conv3x3_only, hidden_ratio, flow_steps, clamp=2.0):
 
+
 """Create NF Fast Flow Block.
    
 This is to create Normalizing Flow (NF) Fast Flow model block based on
-    Figure 2 and Section 3.3 in the reference Fastflow architecture in the paper.
-    Args:
-        input_dimensions (List[int]): Input dimensions (Channel, Height, Width)
-        conv3x3_only (bool): Boolean whether to use conv3x3 only or conv3x3 and conv1x1.
-        hidden_ratio (float): Ratio for the hidden layer channels.
-        flow_steps (int): Flow steps.
-        clamp (float, optional): Clamp. Defaults to 2.0.
-    Returns:
-        SequenceINN: FastFlow Block.
-    """
+Figure 2 and Section 3.3 in the reference Fastflow architecture in the paper.
+
+Args:
+     input_dimensions (List[int]): Input dimensions (Channel, Height, Width)
+     conv3x3_only (bool): Boolean whether to use conv3x3 only or conv3x3 and conv1x1.
+     hidden_ratio (float): Ratio for the hidden layer channels.
+     flow_steps (int): Flow steps.
+     clamp (float, optional): Clamp. Defaults to 2.0.
+ Returns:
+     SequenceINN: FastFlow Block.
+ """
+ 
+ 
     nodes = Ff.SequenceINN(*input_dimensions)
     for i in range(flow_steps):
         if i % 2 == 1 and not conv3x3_only:
@@ -212,7 +216,7 @@ class FastFlow(nn.Module):
 """FastFlow.
     Unsupervised Anomaly Detection and Localization via 2D Normalizing Flows.
     Args:
-        input_size (Tuple[int, int]): Model input size.
+        input_size (int): Model input size,
         backbone (str): Backbone CNN network
         flow_steps (int): Flow steps.
         conv3x3_only (bool, optinoal): Use only conv3x3 in fast_flow model. Defaults to False.
@@ -221,18 +225,17 @@ class FastFlow(nn.Module):
         ValueError: When the backbone is not supported.
     """
 
+
     def __init__(
         self,
-        input_size: Tuple[int, int],
-        backbone_name: str,
-        flow_steps: int,
-        conv3x3_only: bool=False,
-        hidden_ratio: float=1.0,
+        input_size,
+        backbone_name,
+        flow_steps,
+        conv3x3_only=False,
+        hidden_ratio=1.0,
     ):
         super(FastFlow, self).__init__()
         
-        #Have a second look at line 234 as it is the output of the reconstructive subnetwork
-        self.input_size = input_size
 
 
         if backbone_name in ["cait_m48_448", "deit_base_distilled_patch16_384"]:
@@ -259,7 +262,7 @@ class FastFlow(nn.Module):
             for channel, scale in zip(channels, scales):
                 self.norms.append(
                     nn.LayerNorm(
-                        [channel, int(input_size[0] / scale), int(input_size[1] / scale)],
+                        [in_channels, int(input_size / scale), int(input_size / scale)],
                         elementwise_affine=True,
                     )
                 )
@@ -276,27 +279,20 @@ class FastFlow(nn.Module):
         for channel, scale in zip(channels, scales):
             self.nf_flows.append(
                 nf_fast_flow(
-                    [channel, int(input_size[0] / scale), int(input_size[1] / scale)],
+                    [in_channels, int(input_size / scale), int(input_size / scale)],
                     conv3x3_only=conv3x3_only,
                     hidden_ratio=hidden_ratio,
                     flow_steps=flow_steps,
                 )
             )
-   
+          
+        
+        #Have a second look at line 234 as it is the output of the reconstructive subnetwork
+        self.input_size = input_size
         self.anomaly_map_generator = AnomalyMapGenerator(input_size=input_size)
 
-    def forward(self, input_tensor) -> Union[Tuple[List[Tensor], List[Tensor]], Tensor]:
-    
-        """Forward-Pass the input to the FastFlow Model.
-        Args:
-            input_tensor (Tensor): Input tensor.
-        Returns:
-            Union[Tuple[Tensor, Tensor], Tensor]: During training, return
-                (hidden_variables, log-of-the-jacobian-determinants).
-                During the validation/test, return the anomaly map.
-        """
-        return_val: Union[Tuple[List[Tensor], List[Tensor]], Tensor]    
-        
+    def forward(self, input_tensor):
+          
         self.feature_extractor.eval()
         if isinstance(self.feature_extractor, VisionTransformer):
             features = self._get_vit_features(input_tensor)
