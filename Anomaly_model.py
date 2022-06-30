@@ -221,6 +221,7 @@ class FastFlow(nn.Module):
             self.feature_extractor = timm.create_model(
                 backbone_name,
                 pretrained=True,
+                in_chans = 6,
                 features_only=True,
                 out_indices=[1, 2, 3],
             )
