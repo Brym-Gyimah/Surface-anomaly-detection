@@ -258,7 +258,7 @@ class FastFlow(nn.Module):
             )
           
 
-        self.anomaly_map_generator = AnomalyMapGenerator(input_size=input_size)
+        #self.anomaly_map_generator = AnomalyMapGenerator(input_size=input_size)
 
     def forward(self, input_tensor):
           
@@ -288,10 +288,23 @@ class FastFlow(nn.Module):
       
       
         if not self.training:
-            return_val = self.anomaly_map_generator(hidden_variables)
-
-        return return_val
+            flow_maps= []
+            for hidden_variable in hidden_variables:
+                log_prob = -torch.mean(hidden_variable**2, dim=1, keepdim=True) * 0.5
+                prob = torch.exp(log_prob)
+                flow_map = F.interpolate(
+                   input=-prob,
+                   size=self.input_size,
+                   mode="bilinear",
+                   align_corners=False,
+                )
+                flow_maps.append(flow_map)
+            
+            flow_maps = torch.stack(flow_maps, dim=-1)
+            anomaly_map = torch.mean(flow_maps, dim=-1)
+            return_val["anomaly_map"] = anomaly_map
         
+        return return_val
     
     def _get_cnn_features(self, input_tensor):
 
