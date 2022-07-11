@@ -207,6 +207,8 @@ class FastFlow(nn.Module):
     ):
         super(FastFlow, self).__init__()
         
+        self.input_size = input_size
+        
         assert (
             backbone_name in const.SUPPORTED_BACKBONES
         ), "backbone_name must be one of {}".format(const.SUPPORTED_BACKBONES)
@@ -255,16 +257,19 @@ class FastFlow(nn.Module):
                 )
             )
           
-        self.input_size = input_size
-        #self.anomaly_map_generator = AnomalyMapGenerator(input_size=input_size)
+
+        self.anomaly_map_generator = AnomalyMapGenerator(input_size=input_size)
 
     def forward(self, input_tensor):
           
         self.feature_extractor.eval()
+        
         if isinstance(self.feature_extractor, VisionTransformer):
             features = self._get_vit_features(input_tensor)
+            
         elif isinstance(self.feature_extractor, Cait):
             features = self._get_cait_features(input_tensor)
+            
         else:
             features = self._get_cnn_features(input_tensor)             
         
@@ -272,8 +277,8 @@ class FastFlow(nn.Module):
         # (See Section 3.3 in the paper.)
         # NOTE: output variable has z, and jacobian tuple for each fast-flow blocks.
         
-        hidden_variables: List[Tensor] = []
-        log_jacobians: List[Tensor] = []
+        hidden_variables = []
+        log_jacobians = []
         for nf_fast_flow, feature in zip(self.nf_flows, features):
             hidden_variable, log_jacobian = nf_fast_flow(feature)
             hidden_variables.append(hidden_variable)
@@ -292,6 +297,7 @@ class FastFlow(nn.Module):
 
         features = self.feature_extractor(input_tensor)
         features = [self.norms[i](feature) for i, feature in enumerate(features)]
+        
         return features
         
 
@@ -305,8 +311,9 @@ class FastFlow(nn.Module):
         batch_size, _, num_channels = feature.shape
         feature = self.feature_extractor.norm(feature)
         feature = feature.permute(0, 2, 1)
-        feature = feature.reshape(batch_size, num_channels, self.input_size[0] // 16, self.input_size[1] // 16)
+        feature = feature.reshape(batch_size, num_channels, self.input_size // 16, self.input_size // 16)
         features = [feature]
+        
         return features
 
 
@@ -332,6 +339,7 @@ class FastFlow(nn.Module):
         feature = feature[:, 2:, :]
         batch_size, _, num_channels = feature.shape
         feature = feature.permute(0, 2, 1)
-        feature = feature.reshape(batch_size, num_channels, self.input_size[0] // 16, self.input_size[1] // 16)
+        feature = feature.reshape(batch_size, num_channels, self.input_size // 16, self.input_size // 16)
         features = [feature]
+        
         return features
