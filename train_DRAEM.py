@@ -3,7 +3,7 @@ from data_loader import MVTecDRAEMTrainDataset
 from torch.utils.data import DataLoader
 from torch import optim
 from tensorboard_visualizer import TensorboardVisualizer
-from model_unet import ReconstructiveSubNetwork, DiscriminativeSubNetwork
+from model_deeplabv3plus import ReconstructiveSubNetwork, DeepLabV3Plus
 from loss import FocalLoss, SSIM
 import os
 
@@ -36,7 +36,7 @@ def train_on_device(obj_names, args):
         model.cuda()
         model.apply(weights_init)
 
-        model_seg = DiscriminativeSubNetwork(in_channels=6, out_channels=2)
+        model_seg = DeepLabV3Plus(in_channels=6, out_channels=2)
         model_seg.cuda()
         model_seg.apply(weights_init)
 
