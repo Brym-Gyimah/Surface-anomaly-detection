@@ -1,11 +1,12 @@
 import torch
-from data_loader import MVTecDRAEMTrainDataset
+from data_loader import MVTecTrainDataset
 from torch.utils.data import DataLoader
 from torch import optim
 from tensorboard_visualizer import TensorboardVisualizer
 from model_deeplabv3plus import ReconstructiveSubNetwork, DeepLabV3Plus
 from loss import FocalLoss, SSIM
 import os
+
 
 def get_lr(optimizer):
     for param_group in optimizer.param_groups:
@@ -158,4 +159,3 @@ if __name__=="__main__":
 
     with torch.cuda.device(args.gpu_id):
         train_on_device(picked_classes, args)
-
