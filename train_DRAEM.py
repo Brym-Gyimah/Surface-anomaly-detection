@@ -37,9 +37,9 @@ def train_on_device(obj_names, args):
         model.cuda()
         model.apply(weights_init)
 
-        model_seg = DeepLabV3Plus(in_channels=6, out_channels=2)
+        model_seg = DeepLabV3Plus(in_channels=6,) # out_channels=2)
         model_seg.cuda()
-        model_seg.apply(weights_init)
+        #model_seg.apply(weights_init)
 
         optimizer = torch.optim.Adam([
                                       {"params": model.parameters(), "lr": args.lr},
@@ -51,7 +51,7 @@ def train_on_device(obj_names, args):
         loss_ssim = SSIM()
         loss_focal = FocalLoss()
 
-        dataset = MVTecDRAEMTrainDataset(args.data_path + obj_name + "/train/good/", args.anomaly_source_path, resize_shape=[256, 256])
+        dataset = MVTecTrainDataset(args.data_path + obj_name + "/train/good/", args.anomaly_source_path, resize_shape=[256, 256])
 
         dataloader = DataLoader(dataset, batch_size=args.bs,
                                 shuffle=True, num_workers=16)
