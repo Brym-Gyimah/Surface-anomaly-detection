@@ -196,20 +196,9 @@ class DeepLabV3Plus(SegmentationModel):
         https://arxiv.org/abs/1802.02611v3
     """
 
-    def __init__(
-        self,
-        encoder_name: str = "resnet34",
-        encoder_depth: int = 5,
-        encoder_weights: Optional[str] = "imagenet",
-        encoder_output_stride: int = 16,
-        decoder_channels: int = 256,
-        decoder_atrous_rates: tuple = (12, 24, 36),
-        in_channels: int = 3,
-        classes: int = 1,
-        activation: Optional[str] = None,
-        upsampling: int = 4,
-        aux_params: Optional[dict] = None,
-    ):
+    def __init__(self, encoder_name: str = "resnet34", encoder_depth: int = 5, encoder_weights: Optional[str] = "imagenet", encoder_output_stride: int = 16, 
+    decoder_channels: int = 256, decoder_atrous_rates: tuple = (12, 24, 36), in_channels: int = 3, classes: int = 1, activation: Optional[str] = None, 
+    upsampling: int = 4, aux_params: Optional[dict] = None,):
         super().__init__()
 
         if encoder_output_stride not in [8, 16]:
