@@ -8,7 +8,7 @@ from segmentation_models_pytorch.base import (
     ClassificationHead,
 )
 from segmentation_models_pytorch.encoders import get_encoder
-from .decoder import DeepLabV3Decoder, DeepLabV3PlusDecoder
+from segmentation_models_pytorch.decoders.deeplabv3.decoder import DeepLabV3Decoder, DeepLabV3PlusDecoder
 
 
 class ReconstructiveSubNetwork(nn.Module):
