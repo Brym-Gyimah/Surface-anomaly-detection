@@ -39,7 +39,6 @@ def train_on_device(obj_names, args):
 
         model_seg = DeepLabV3Plus(in_channels=6,) # out_channels=2)
         model_seg.cuda()
-        #model_seg.apply(weights_init)
 
         optimizer = torch.optim.Adam([
                                       {"params": model.parameters(), "lr": args.lr},
@@ -54,7 +53,7 @@ def train_on_device(obj_names, args):
         dataset = MVTecDRAEMTrainDataset(args.data_path + obj_name + "/train/good/", args.anomaly_source_path, resize_shape=[256, 256])
 
         dataloader = DataLoader(dataset, batch_size=args.bs,
-                                shuffle=True, num_workers=16)
+                                shuffle=True, num_workers=16, drop_last=True)
 
         n_iter = 0
         for epoch in range(args.epochs):
@@ -65,9 +64,14 @@ def train_on_device(obj_names, args):
                 anomaly_mask = sample_batched["anomaly_mask"].cuda()
 
                 gray_rec = model(aug_gray_batch)
+                #print(gray_rec.shape)
+
                 joined_in = torch.cat((gray_rec, aug_gray_batch), dim=1)
+                #print(joined_in.shape)
 
                 out_mask = model_seg(joined_in)
+                #print(out_mask.shape)
+
                 out_mask_sm = torch.softmax(out_mask, dim=1)
 
                 l2_loss = loss_l2(gray_rec,gray_batch)
