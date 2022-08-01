@@ -10,3 +10,4 @@ omegaconf
 opencv-python-headless==4.3.0.36
 pretrainedmodels
 efficientnet_pytorch
+kornia
