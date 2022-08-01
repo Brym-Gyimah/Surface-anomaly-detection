@@ -77,11 +77,11 @@ def train_on_device(obj_names, args):
 
                 l2_loss = loss_l2(gray_rec,gray_batch)
                 ssim_loss = loss_ssim(gray_rec, gray_batch)
-                msgms_ loss = loss_msgms(gray_rec, gray_batch)
+                msgms_loss = loss_msgms(gray_rec, gray_batch)
 
 
                 segment_loss = loss_focal(out_mask_sm, anomaly_mask)
-                loss = l2_loss + ssim_loss + msgms_ loss + segment_loss
+                loss = l2_loss + ssim_loss + msgms_loss + segment_loss
 
                 optimizer.zero_grad()
 
