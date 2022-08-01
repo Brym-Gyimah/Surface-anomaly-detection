@@ -4,7 +4,7 @@ from torch.utils.data import DataLoader
 from torch import optim
 from tensorboard_visualizer import TensorboardVisualizer
 from model_deeplabv3plus import ReconstructiveSubNetwork, DeepLabV3Plus
-from loss import FocalLoss, SSIM
+from loss import FocalLoss, SSIM, MSGMS_Loss
 import os
 
 
@@ -48,6 +48,7 @@ def train_on_device(obj_names, args):
 
         loss_l2 = torch.nn.modules.loss.MSELoss()
         loss_ssim = SSIM()
+        loss_msgms = MSGMS_Loss()
         loss_focal = FocalLoss()
 
         dataset = MVTecDRAEMTrainDataset(args.data_path + obj_name + "/train/good/", args.anomaly_source_path, resize_shape=[256, 256])
@@ -76,9 +77,11 @@ def train_on_device(obj_names, args):
 
                 l2_loss = loss_l2(gray_rec,gray_batch)
                 ssim_loss = loss_ssim(gray_rec, gray_batch)
+                msgms_ loss = loss_msgms(gray_rec, gray_batch)
+
 
                 segment_loss = loss_focal(out_mask_sm, anomaly_mask)
-                loss = l2_loss + ssim_loss + segment_loss
+                loss = l2_loss + ssim_loss + msgms_ loss + segment_loss
 
                 optimizer.zero_grad()
 
