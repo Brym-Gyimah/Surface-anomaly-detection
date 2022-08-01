@@ -252,3 +252,4 @@ class MSGMS_Score(nn.Module):
             total_scores += F.interpolate(score, size=img_size, mode='bilinear', align_corners=False)
 
         return (1 - total_scores) / 4
+    
