@@ -51,7 +51,8 @@ def train_on_device(obj_names, args):
         loss_msgms = MSGMS_Loss()
         loss_focal = FocalLoss()
 
-        dataset = MVTecDRAEMTrainDataset(args.data_path + obj_name + "/train/good/", args.anomaly_source_path, resize_shape=[256, 256])
+        #dataset = MVTecDRAEMTrainDataset(args.data_path + obj_name + "/train/good/", args.anomaly_source_path, resize_shape=[256, 256])
+        dataset = MVTecDRAEMTrainDataset(args.data_path + obj_name + "/train/", args.anomaly_source_path, resize_shape=[256, 256])
 
         dataloader = DataLoader(dataset, batch_size=args.bs,
                                 shuffle=True, num_workers=16, drop_last=True)
@@ -126,39 +127,29 @@ if __name__=="__main__":
 
     args = parser.parse_args()
 
-    obj_batch = [['capsule'],
-                 ['bottle'],
-                 ['carpet'],
-                 ['leather'],
-                 ['pill'],
-                 ['transistor'],
-                 ['tile'],
-                 ['cable'],
-                 ['zipper'],
-                 ['toothbrush'],
-                 ['metal_nut'],
-                 ['hazelnut'],
-                 ['screw'],
-                 ['grid'],
-                 ['wood']
+    obj_batch = [['class1'],
+                 ['class2'],
+                 ['class3'],
+                 ['class4'],
+                 ['class5'],
+                 ['class6'],
+                 ['class7'],
+                 ['class8'],
+                 ['class9'],
+                 ['class10']
                  ]
 
     if int(args.obj_id) == -1:
-        obj_list = ['capsule',
-                     'bottle',
-                     'carpet',
-                     'leather',
-                     'pill',
-                     'transistor',
-                     'tile',
-                     'cable',
-                     'zipper',
-                     'toothbrush',
-                     'metal_nut',
-                     'hazelnut',
-                     'screw',
-                     'grid',
-                     'wood'
+        obj_list = ['class1',
+                     'class2',
+                     'class3',
+                     'class4',
+                     'class5',
+                     'class6',
+                     'class7',
+                     'class8',
+                     'class9',
+                     'class10'
                      ]
         picked_classes = obj_list
     else:
