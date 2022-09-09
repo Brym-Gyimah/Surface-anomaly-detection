@@ -20,6 +20,7 @@ def weights_init(m):
         m.weight.data.normal_(1.0, 0.02)
         m.bias.data.fill_(0)
 
+             
 def train_on_device(obj_names, args):
 
     if not os.path.exists(args.checkpoint_path):
@@ -107,7 +108,7 @@ def train_on_device(obj_names, args):
 
             torch.save(model.state_dict(), os.path.join(args.checkpoint_path, run_name+".pckl"))
             torch.save(model_seg.state_dict(), os.path.join(args.checkpoint_path, run_name+"_seg.pckl"))
-
+        
 
 if __name__=="__main__":
     import argparse
@@ -126,29 +127,39 @@ if __name__=="__main__":
 
     args = parser.parse_args()
 
-    obj_batch = [['class1'],
-                 ['class2'],
-                 ['class3'],
-                 ['class4'],
-                 ['class5'],
-                 ['class6'],
-                 ['class7'],
-                 ['class8'],
-                 ['class9'],
-                 ['class10']
+    obj_batch = [['capsule'],
+                 ['bottle'],
+                 ['carpet'],
+                 ['leather'],
+                 ['pill'],
+                 ['transistor'],
+                 ['tile'],
+                 ['cable'],
+                 ['zipper'],
+                 ['toothbrush'],
+                 ['metal_nut'],
+                 ['hazelnut'],
+                 ['screw'],
+                 ['grid'],
+                 ['wood']
                  ]
 
     if int(args.obj_id) == -1:
-        obj_list = ['class1',
-                     'class2',
-                     'class3',
-                     'class4',
-                     'class5',
-                     'class6',
-                     'class7',
-                     'class8',
-                     'class9',
-                     'class10'
+        obj_list = ['capsule',
+                     'bottle',
+                     'carpet',
+                     'leather',
+                     'pill',
+                     'transistor',
+                     'tile',
+                     'cable',
+                     'zipper',
+                     'toothbrush',
+                     'metal_nut',
+                     'hazelnut',
+                     'screw',
+                     'grid',
+                     'wood'
                      ]
         picked_classes = obj_list
     else:
