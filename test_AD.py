@@ -154,21 +154,16 @@ if __name__=="__main__":
 
     args = parser.parse_args()
 
-    obj_list = ['capsule',
-                 'bottle',
-                 'carpet',
-                 'leather',
-                 'pill',
-                 'transistor',
-                 'tile',
-                 'cable',
-                 'zipper',
-                 'toothbrush',
-                 'metal_nut',
-                 'hazelnut',
-                 'screw',
-                 'grid',
-                 'wood'
+    obj_list = ['class1',
+                 'class2',
+                 'class3',
+                 'class4',
+                 'class5',
+                 'class6',
+                 'class7',
+                 'class8',
+                 'class9',
+                 'class10'
                  ]
 
     with torch.cuda.device(args.gpu_id):
