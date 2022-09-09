@@ -51,8 +51,7 @@ def train_on_device(obj_names, args):
         loss_msgms = MSGMS_Loss()
         loss_focal = FocalLoss()
 
-        #dataset = MVTecDRAEMTrainDataset(args.data_path + obj_name + "/train/good/", args.anomaly_source_path, resize_shape=[256, 256])
-        dataset = MVTecDRAEMTrainDataset(args.data_path + obj_name + "/train/", args.anomaly_source_path, resize_shape=[256, 256])
+        dataset = MVTecDRAEMTrainDataset(args.data_path + obj_name + "/train/good/", args.anomaly_source_path, resize_shape=[256, 256])
 
         dataloader = DataLoader(dataset, batch_size=args.bs,
                                 shuffle=True, num_workers=16, drop_last=True)
