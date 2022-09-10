@@ -53,9 +53,10 @@ def train_on_device(obj_names, args):
         loss_focal = FocalLoss()
 
         dataset = MVTecDRAEMTrainDataset(args.data_path + obj_name + "/train/good/", args.anomaly_source_path, resize_shape=[256, 256])
-
+        print( obj_name, len(dataset))
         dataloader = DataLoader(dataset, batch_size=args.bs,
                                 shuffle=True, num_workers=16, drop_last=True)
+        
 
         n_iter = 0
         for epoch in range(args.epochs):
@@ -127,40 +128,30 @@ if __name__=="__main__":
 
     args = parser.parse_args()
 
-    obj_batch = [['capsule'],
-                 ['bottle'],
-                 ['carpet'],
-                 ['leather'],
-                 ['pill'],
-                 ['transistor'],
-                 ['tile'],
-                 ['cable'],
-                 ['zipper'],
-                 ['toothbrush'],
-                 ['metal_nut'],
-                 ['hazelnut'],
-                 ['screw'],
-                 ['grid'],
-                 ['wood']
+    obj_batch = [['Class1'],
+                 ['Class10'],
+                 ['Class2'],
+                 ['Class3'],
+                 ['Class4'],
+                 ['Class5'],
+                 ['Class6'],
+                 ['Class7'],
+                 ['Class8'],
+                 ['Class9']
                  ]
 
     if int(args.obj_id) == -1:
-        obj_list = ['capsule',
-                     'bottle',
-                     'carpet',
-                     'leather',
-                     'pill',
-                     'transistor',
-                     'tile',
-                     'cable',
-                     'zipper',
-                     'toothbrush',
-                     'metal_nut',
-                     'hazelnut',
-                     'screw',
-                     'grid',
-                     'wood'
-                     ]
+        obj_list = ['Class1',
+                    'Class10',
+                    'Class2',
+                    'Class3',
+                    'Class4',
+                    'Class5',
+                    'Class6',
+                    'Class7',
+                    'Class8',
+                    'Class9',
+                    ]
         picked_classes = obj_list
     else:
         picked_classes = obj_batch[int(args.obj_id)]
