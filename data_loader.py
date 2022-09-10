@@ -11,7 +11,7 @@ class MVTecDRAEMTestDataset(Dataset):
 
     def __init__(self, root_dir, resize_shape=None):
         self.root_dir = root_dir
-        self.images = sorted(glob.glob(root_dir+"/*/*.png"))
+        self.images = sorted(glob.glob(root_dir+"/*/*.PNG"))
         self.resize_shape=resize_shape
 
     def __len__(self):
@@ -50,7 +50,7 @@ class MVTecDRAEMTestDataset(Dataset):
         else:
             mask_path = os.path.join(dir_path, '../../ground_truth/')
             mask_path = os.path.join(mask_path, base_dir)
-            mask_file_name = file_name.split(".")[0]+"_mask.png"
+            mask_file_name = file_name.split(".")[0]+"_mask.PNG"
             mask_path = os.path.join(mask_path, mask_file_name)
             image, mask = self.transform_image(img_path, mask_path)
             has_anomaly = np.array([1], dtype=np.float32)
@@ -73,7 +73,7 @@ class MVTecDRAEMTrainDataset(Dataset):
         self.root_dir = root_dir
         self.resize_shape=resize_shape
 
-        self.image_paths = sorted(glob.glob(root_dir+"/*.png"))
+        self.image_paths = sorted(glob.glob(root_dir+"/*.PNG"))
 
         self.anomaly_source_paths = sorted(glob.glob(anomaly_source_path+"/*/*.jpg"))
 
