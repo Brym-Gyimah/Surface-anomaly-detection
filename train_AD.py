@@ -128,29 +128,29 @@ if __name__=="__main__":
 
     args = parser.parse_args()
 
-    obj_batch = [['Class1'],
-                 ['Class10'],
-                 ['Class2'],
-                 ['Class3'],
-                 ['Class4'],
-                 ['Class5'],
-                 ['Class6'],
-                 ['Class7'],
-                 ['Class8'],
-                 ['Class9']
+    obj_batch = [['class1'],
+                 ['class10'],
+                 ['class2'],
+                 ['class3'],
+                 ['class4'],
+                 ['class5'],
+                 ['class6'],
+                 ['class7'],
+                 ['class8'],
+                 ['class9']
                  ]
 
     if int(args.obj_id) == -1:
-        obj_list = ['Class1',
-                    'Class10',
-                    'Class2',
-                    'Class3',
-                    'Class4',
-                    'Class5',
-                    'Class6',
-                    'Class7',
-                    'Class8',
-                    'Class9',
+        obj_list = ['class1',
+                    'class10',
+                    'class2',
+                    'class3',
+                    'class4',
+                    'class5',
+                    'class6',
+                    'class7',
+                    'class8',
+                    'class9',
                     ]
         picked_classes = obj_list
     else:
