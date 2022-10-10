@@ -4,7 +4,9 @@ from data_loader import MVTecDRAEMTestDataset
 from torch.utils.data import DataLoader
 import numpy as np
 from sklearn.metrics import roc_auc_score, average_precision_score
-from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import confusion_matrix
+
 from model_deeplabv3plus import ReconstructiveSubNetwork, DeepLabV3Plus
 import os
 
@@ -119,51 +121,30 @@ def test(obj_names, mvtec_path, checkpoint_path, base_model_name):
         anomaly_score_gt = np.array(anomaly_score_gt)
         auroc = roc_auc_score(anomaly_score_gt, anomaly_score_prediction)
         ap = average_precision_score(anomaly_score_gt, anomaly_score_prediction)
+        #precision, recall, thresholds= precision_recall_curve(anomaly_score_gt, anomaly_score_prediction)     
+        #print(np.mean(precision))
+        #print(np.mean(recall))
         
-        
-        Accuracy = accuracy_score(anomaly_score_gt, anomaly_score_prediction)
-        confMat = confusion_matrix(anomaly_score_gt, anomaly_score_prediction)
-        classReport = classification_report(anomaly_score_gt, anomaly_score_prediction)
+        tn, fp, fn, tp = confusion_matrix([anomaly_score_gt], [anomaly_score_prediction]).ravel()    
+        print(tn)
+        print(fp)
+        print(fn)
+        print(tp)
 
         total_gt_pixel_scores = total_gt_pixel_scores.astype(np.uint8)
         total_gt_pixel_scores = total_gt_pixel_scores[:img_dim * img_dim * mask_cnt]
         total_pixel_scores = total_pixel_scores[:img_dim * img_dim * mask_cnt]
-
-
         auroc_pixel = roc_auc_score(total_gt_pixel_scores, total_pixel_scores)
         ap_pixel = average_precision_score(total_gt_pixel_scores, total_pixel_scores)
-
-
-        Accuracy_pixel = accuracy_score(total_gt_pixel_scores, total_pixel_scores)
-        confMat_pixel = confusion_matrix(total_gt_pixel_scores, total_pixel_scores)
-        classReport_pixel = classification_report(total_gt_pixel_scores, total_pixel_scores)
-
         obj_ap_pixel_list.append(ap_pixel)
         obj_auroc_pixel_list.append(auroc_pixel)
         obj_auroc_image_list.append(auroc)
         obj_ap_image_list.append(ap)
-
-        obj_Accuracy_image_list.append(Accuracy)
-        obj_confMat_image_list.append(confMat)
-        obj_classReport_image_list.append(classReport)
-
-        obj_Accuracy_pixel_list.append(Accuracy_pixel)
-        obj_confMat_pixel_list.append(confMat_pixel)
-        obj_classReport_pixel_list.append(classReport_pixel)
-
         print(obj_name)
         print("AUC Image:  " +str(auroc))
         print("AP Image:  " +str(ap))
         print("AUC Pixel:  " +str(auroc_pixel))
         print("AP Pixel:  " +str(ap_pixel))
-        print("==============================")       
-        print("C_Accuracy Image:  " +str(Accuracy))
-        print("conf_mat Image:  " +str(confMat))
-        print("class_report Image:  " +str(classReport))  
-        print("==============================")    
-        print("C_Accuracy Pixel:  " +str(Accuracy_pixel))
-        print("conf_mat Pixel:  " +str(confMat_pixel))
-        print("class_report Pixel:  " +str(classReport_pixel))        
         print("==============================")
 
     print(run_name)
@@ -172,15 +153,7 @@ def test(obj_names, mvtec_path, checkpoint_path, base_model_name):
     print("AUC Pixel mean:  " + str(np.mean(obj_auroc_pixel_list)))
     print("AP Pixel mean:  " + str(np.mean(obj_ap_pixel_list)))
 
-    print("C_Accuracy Image mean:  " + str(np.mean(obj_Accuracy_image_list)))
-    print("conf_mat Image mean:  " + str(np.mean(obj_confMat_image_list)))
-    print("class_report Image mean:  " + str(np.mean(obj_classReport_image_list)))
-
-    print("C_Accuracy Pixel mean:  " + str(np.mean(obj_Accuracy_pixel_list)))
-    print("conf_mat Pixel mean:  " + str(np.mean(obj_confMat_pixel_list)))
-    print("class_report Pixel mean:  " + str(np.mean(obj_classReport_pixel_list)))
-
-    write_results_to_file(run_name, obj_auroc_image_list, obj_auroc_pixel_list, obj_ap_image_list, obj_ap_pixel_list, obj_Accuracy_image_list, obj_confMat_image_list, obj_classReport_image_list, obj_Accuracy_pixel_list, obj_confMat_pixel_list, obj_classReport_pixel_list)
+    write_results_to_file(run_name, obj_auroc_image_list, obj_auroc_pixel_list, obj_ap_image_list, obj_ap_pixel_list)
 
 if __name__=="__main__":
     import argparse
