@@ -128,30 +128,41 @@ if __name__=="__main__":
 
     args = parser.parse_args()
 
-    obj_batch = [['class1'],
-                 ['class10'],
-                 ['class2'],
-                 ['class3'],
-                 ['class4'],
-                 ['class5'],
-                 ['class6'],
-                 ['class7'],
-                 ['class8'],
-                 ['class9']
+
+    obj_batch = [['capsule'],
+                 ['bottle'],
+                 ['carpet'],
+                 ['leather'],
+                 ['pill'],
+                 ['transistor'],
+                 ['tile'],
+                 ['cable'],
+                 ['zipper'],
+                 ['toothbrush'],
+                 ['metal_nut'],
+                 ['hazelnut'],
+                 ['screw'],
+                 ['grid'],
+                 ['wood']
                  ]
 
     if int(args.obj_id) == -1:
-        obj_list = ['class1',
-                    'class10',
-                    'class2',
-                    'class3',
-                    'class4',
-                    'class5',
-                    'class6',
-                    'class7',
-                    'class8',
-                    'class9',
-                    ]
+        obj_list = ['capsule',
+                     'bottle',
+                     'carpet',
+                     'leather',
+                     'pill',
+                     'transistor',
+                     'tile',
+                     'cable',
+                     'zipper',
+                     'toothbrush',
+                     'metal_nut',
+                     'hazelnut',
+                     'screw',
+                     'grid',
+                     'wood'
+                     ]
         picked_classes = obj_list
     else:
         picked_classes = obj_batch[int(args.obj_id)]
