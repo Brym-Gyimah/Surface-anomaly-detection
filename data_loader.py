@@ -11,7 +11,7 @@ class MVTecDRAEMTestDataset(Dataset):
 
     def __init__(self, root_dir, resize_shape=None):
         self.root_dir = root_dir
-        self.images = sorted(glob.glob(root_dir+"/*/*.PNG"))
+        self.images = sorted(glob.glob(root_dir+"/*/*.png"))
         self.resize_shape=resize_shape
 
     def __len__(self):
@@ -73,7 +73,7 @@ class MVTecDRAEMTrainDataset(Dataset):
         self.root_dir = root_dir
         self.resize_shape=resize_shape
 
-        self.image_paths = sorted(glob.glob(root_dir+"/*.PNG"))
+        self.image_paths = sorted(glob.glob(root_dir+"/*.png"))
 
         self.anomaly_source_paths = sorted(glob.glob(anomaly_source_path+"/*/*.jpg"))
 
