@@ -4,9 +4,14 @@ from data_loader import MVTecDRAEM_Test_Visual_Dataset
 from torch.utils.data import DataLoader
 import numpy as np
 from sklearn.metrics import roc_auc_score, average_precision_score
-from model_unet import ReconstructiveSubNetwork, DiscriminativeSubNetwork
+from model_deeplabv3plus import ReconstructiveSubNetwork, DeepLabV3Plus
 import os
 import matplotlib.pyplot as plt
+from PIL import Image
+from torchvision import transforms
+import cv2
+
+
 
 
 def test(obj_names, mvtec_path, checkpoint_path, base_model_name):
@@ -23,7 +28,7 @@ def test(obj_names, mvtec_path, checkpoint_path, base_model_name):
         model.cuda()
         model.eval()
 
-        model_seg = DiscriminativeSubNetwork(in_channels=6, out_channels=2)
+        model_seg = DeepLabV3Plus(in_channels=6,)
         model_seg.load_state_dict(torch.load(os.path.join(checkpoint_path, run_name+"_seg.pckl"), map_location='cuda:0'))
         model_seg.cuda()
         model_seg.eval()
@@ -79,9 +84,19 @@ def test(obj_names, mvtec_path, checkpoint_path, base_model_name):
                 cnt_display += 1
             
             out_mask_cv = out_mask_sm[0 ,1 ,: ,:].detach().cpu().numpy()
+            print (out_mask_cv.shape)
             plt.imshow(out_mask_cv)
             plt.title('Predicted Anomaly Heatmap') 
-            plt.show()
+            for i, image in enumerate(out_mask_cv):
+              plt.savefig("./outputs/image_{}.png".format(i))
+
+              
+              #image.save("./outputs/image_{}.png".format(i))
+            print("{} images saved in the 'images' directory.".format(len(out_mask_cv)))
+            #plt.savefig("./outputs/image.png")
+            #plt.show()
+
+
 
             out_mask_averaged = torch.nn.functional.avg_pool2d(out_mask_sm[: ,1: ,: ,:], 21, stride=1,
                                                                padding=21 // 2).cpu().detach().numpy()
